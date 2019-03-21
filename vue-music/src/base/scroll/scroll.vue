@@ -28,7 +28,7 @@
       },
       methods:{//定义一个初始化方法
          _initScroll(){
-           //如果第一个参数还是undefined的话
+           //如果第一个参数还是undefined的话,就会报错
            if(!this.$refs.wrapper){
              return
            }
@@ -53,7 +53,7 @@
 
       },
       watch:{
-         //
+         //如果data变化了，就刷新
          data(){
            setTimeout(()=>{
              this.refresh()

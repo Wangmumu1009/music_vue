@@ -9,6 +9,6 @@ export function addClass(el,className) {
 }
 
 export function hasClass(el,className) {
-  let reg = new RegExp('(^|\\s)'+className+'(\\s|$')//要转译
+  let reg = new RegExp('(^|\\s)'+className+'(\\s|$)')//要转译
   return reg.test(el.className)//test()返回boolean，查找对应的字符串中是否存在模式
 }
