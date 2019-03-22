@@ -62,13 +62,13 @@
       if (this.autoPlay) {
         this._play()
       }
-    },
-    deactivated() {
-      clearTimeout(this.timer)
-    },
-    beforeDestroy() {
-      clearTimeout(this.timer)
-    },
+      },
+      deactivated() {
+        clearTimeout(this.timer)
+      },
+      beforeDestroy() {
+        clearTimeout(this.timer)
+      },
       methods:{
          _setSliderWidth(isResize){//整个列表有多少个元素
             this.children = this.$refs.sliderGroup.children;
@@ -175,4 +175,5 @@
           border-radius: 5px
           background: $color-text-ll
 </style>
+
 

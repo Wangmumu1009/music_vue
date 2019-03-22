@@ -1,68 +1,101 @@
 <template>
-    <div ref="wrapper">
-      <slot></slot>
-    </div>
+  <div ref="wrapper">
+    <slot></slot>
+  </div>
 </template>
-
-<script type="text/ecmascript-6">//better-scroll组件
+<script>
   import BScroll from 'better-scroll'
-    export default {
-       props:{
-         probeType:{
-           type:Number,
-           default:1
-         },
-         click:{
-           type:Boolean,
-           default:true
-         },//手动派发点击事件
-         data:{
-           type:Array,
-           default:null
-         }//会有一些数据，是动态变化的，要refrush，如果不refrish滚动条可能滚不动
-       },
-      mounted(){//什么时候调用这个组件
-         setTimeout(()=>{
-            this._initScroll()
-         },20)
+  export default {
+    props: {
+      probeType: {
+        type: Number,
+        default: 1
       },
-      methods:{//定义一个初始化方法
-         _initScroll(){
-           //如果第一个参数还是undefined的话,就会报错
-           if(!this.$refs.wrapper){
-             return
-           }
-           //初始化scroll，然后把$refs.wrapper传入，
-           // 他的参数probeType，外部控制它是什么就初始成什么样，click也是
-           this.scroll = new BScroll(this.$refs.wrapper,{
-             probeType:this.probeType,
-             click:this.click
-           })
-
-         },
-        enable(){
-           this.scroll && this.scroll.enable()
-        },
-        disable(){
-          this.scroll && this.scroll.disable()
-        },
-        refresh(){
-           //刷新这个scroll，并重新计算它的高度
-          this.scroll && this.scroll.refresh()
+      click: {
+        type: Boolean,
+        default: true
+      },
+      data: {
+        type: Array,
+        default: null
+      },
+      listenScroll: {
+        type: Boolean,
+        default: false
+      },
+      pullUp: {
+        type: Boolean,
+        default: false
+      },
+      beforeScroll: {
+        type: Boolean,
+        default: false
+      },
+      refreshDelay: {
+        type: Number,
+        default: 20
+      }
+    },
+    mounted() {
+      setTimeout(() => {
+        this._initScroll()
+      }, 20)
+    },
+    methods: {
+      _initScroll() {
+        if (!this.$refs.wrapper) {
+          return
         }
-
+        this.scroll = new BScroll(this.$refs.wrapper, {
+          probeType: this.probeType,
+          click: this.click
+        })
+        if (this.listenScroll) {
+          let _this = this
+          this.scroll.on('scroll', pos => {
+            // 派发事件获取pos 值
+            _this.$emit('scroll', pos)
+          })
+        }
+        // 上拉刷新
+        if (this.pullUp) {
+          this.scroll.on('scrollEnd', () => {
+            if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+              this.$emit('scrollToEnd')
+            }
+          })
+        }
+        // 开始滚动前判断
+        if (this.beforeScroll) {
+          this.scroll.on('beforeScrollStart', () => {
+            this.$emit('beforeScroll')
+          })
+        }
       },
-      watch:{
-         //如果data变化了，就刷新
-         data(){
-           setTimeout(()=>{
-             this.refresh()
-           },20)
-  }
-}
+      enable() {
+        this.scroll && this.scroll.enable()
+      },
+      disable() {
+        this.scroll && this.scroll.disable()
+      },
+      refresh() {
+        this.scroll && this.scroll.refresh()
+      },
+      scrollTo() {
+        this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+      },
+      scrollToElement() {
+        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
+      }
+    },
+    watch: {
+      data() {
+        setTimeout(() => {
+          this.refresh()
+        }, this.refreshDelay)
+      }
     }
+  }
 </script>
 
-<style scoped>
 
-</style>
