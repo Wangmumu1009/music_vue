@@ -1,39 +1,105 @@
-<!--歌手界面-->
 <template>
-
+  <div class="singer" ref="singer">
+    <list-view @select="selectSinger" :data="singers" ref="list"></list-view>
+    <router-view></router-view>
+  </div>
 </template>
 
-<script type="text/ecmascript-6">
+<script>
+  import ListView from 'base/listview/listview'
+  import {getSingerList} from 'api/singer'
+  import {ERR_OK} from 'api/config'
+  import Singer from 'common/js/singer'
+  import {mapMutations} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
-  import Axios from 'axios';
+  const HOT_SINGER_LEN = 10
+  const HOT_NAME = '热门'
+
   export default {
-    data(){
-      return{
-        musicList:[],
-        isShow:false
+    mixins: [playlistMixin],
+    data() {
+      return {
+        singers: []
       }
     },
-    created(){
-      Axios.get('/api/package.json').then((res)=>{
-        var data = res.data.musicData;
-        data.forEach(elem=>{
-          var obj = {};
-          obj.title = elem.title;
-          obj.src = elem.src;
-          obj.artist = elem.author;
-          obj.pic = elem.musicImgSrc;
-          obj.lrc = 'http://localhost:8080/'+elem.lrc;
-          this.musicList.push(obj);
-        });
-        this.isShow = true;
+    created() {
+      this._getSingerList()
+    },
+    methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.singer.style.bottom = bottom
+        this.$refs.list.refresh()
+      },
+      selectSinger(singer) {
+        this.$router.push({
+          path: `/singer/${singer.id}`
+        })
+        this.setSinger(singer)
+      },
+      _getSingerList() {
+        getSingerList().then((res) => {
+          if (res.code === ERR_OK) {
+            this.singers = this._normalizeSinger(res.data.list)
+          }
+        })
+      },
+      _normalizeSinger(list) {
+        let map = {
+          //热门数据
+          hot: {
+            title: HOT_NAME,
+            items: []
+          }
+        }
+        //遍历
+        list.forEach((item, index) => {
+          if (index < HOT_SINGER_LEN) {
+            map.hot.items.push(new Singer({
+              name: item.Fsinger_name,
+              id: item.Fsinger_mid
+            }))
+          }
+          const key = item.Findex
+          //如果没有key，为聚合的对象，就创建一个，把他赋值给map【key
+          if (!map[key]) {
+            map[key] = {
+              title: key,
+              items: []
+            }
+          }
+          map[key].items.push(new Singer({
+            name: item.Fsinger_name,
+            id: item.Fsinger_mid
+          }))
+        })
+        // 为了得到有序列表，需要处理map
+        let ret = []
+        let hot = []
+        for (let key in map) {
+          let val = map[key]
+          if (val.title.match(/[a-zA-Z]/)) {
+            ret.push(val)
+          } else if (val.title === HOT_NAME) {
+            hot.push(val)
+          }
+        }
+        ret.sort((a, b) => {
+          return a.title.charCodeAt(0) - b.title.charCodeAt(0)
+        })
+        return hot.concat(ret)
+      },
+      ...mapMutations({
+        setSinger: 'SET_SINGER'
       })
     },
-    components:{
-      Aplayer
+    components: {
+      ListView
     }
   }
-</script>
 
+</script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
   .singer
