@@ -5,13 +5,19 @@
       <h2 class="list-group-tittle">{{group.tittle}}</h2>
       <ul>
         <li v-for="item in group.items" class="list-group-item">
-          <img class="avatar" :src="item.avatar"/>
+          <img class="avatar" v-lazy="item.avatar"/>
           <span class="name">{{item.name}}</span>
-
         </li>
       </ul>
     </li>
   </ul>
+  <div class="list-shortcut">
+    <ul>
+      <li>
+
+      </li>
+    </ul>
+  </div>
 </scroll>
 </template>
 

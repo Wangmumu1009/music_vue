@@ -2,7 +2,7 @@ import {commonParams} from './config'
 import axios from 'axios'
 
 export function getSingerList() {
-  const url =  'https://c.y.qq.com/v8/fcg-bin/v8.fcg'
+  const url =  'https://u.y.qq.com/cgi-bin/musicu.fcg'
 
   const data = Object.assign({}, commonParams, {
     channel: 'singer',
