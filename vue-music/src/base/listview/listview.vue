@@ -13,7 +13,7 @@
   </ul>
   <div class="list-shortcut">
     <ul>
-      <li>
+      <li v-for>
 
       </li>
     </ul>
