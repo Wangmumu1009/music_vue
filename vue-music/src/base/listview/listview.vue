@@ -11,10 +11,10 @@
       </ul>
     </li>
   </ul>
-  <div class="list-shortcut">
+  <div class="list-shortcut" @touchstart="onShortcutTouchStart">
     <ul>
-      <li v-for>
-
+      <li v-for="item in shortcutList" class="item">
+        {{item}}
       </li>
     </ul>
   </div>
@@ -30,6 +30,18 @@
            default:[]
          }
        },
+      computed:{
+        shortcutList(){
+          return this.data.map((group)=>{
+            return group.title.substr(0,1)
+          })
+        }
+      },
+      methods:{
+        onShortcutTouchStart(e){
+
+        }
+      },
       components:{
          Scroll
       }
